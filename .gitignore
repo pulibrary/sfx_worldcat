@@ -1,0 +1,9 @@
+/.bundle/
+/tmp/
+*.rb~
+*.mrc
+/output/*.mrc
+/output/*.txt
+/output/full/*.mrc
+/output/full/*.txt
+/output/full/incremental/*.txt

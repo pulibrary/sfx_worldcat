@@ -80,7 +80,7 @@ remaining_objects = all_objects - processed_ids - local_objects - other_objects
 ## in a day
 api_count = 0
 remaining_objects.each do |object_id|
-  break if api_count > 10_000
+  break if api_count > 180_000
   result = get_rec(object_id, client)
   api_count += result[:api_count]
   case result[:rec_type]

@@ -6,4 +6,5 @@
 /output/*.txt
 /output/full/*.mrc
 /output/full/*.txt
-/output/full/incremental/*.txt
+/output/incremental/*.txt
+/output/incremental/*.mrc

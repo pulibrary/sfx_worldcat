@@ -45,7 +45,7 @@ if File.exist?(local_ids_file)
   end
 else
   local_objects = get_local_objects(client)
-  local_objects = local_objects & all_objects
+  local_objects &= all_objects
   File.open(local_ids_file, 'w') do |output|
     local_objects.each do |object|
       output.puts(object)
@@ -72,7 +72,7 @@ if File.exist?(processed_ids_file)
     end
   end
 end
-  
+
 remaining_objects = all_objects - processed_ids - local_objects - other_objects
 
 ## There is a limit to the number
@@ -131,4 +131,3 @@ unless other_objects.empty?
     end
   end
 end
-    

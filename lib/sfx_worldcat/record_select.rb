@@ -1,13 +1,16 @@
 require 'marc'
 
 module SFXWorldcat
-
   include SFXWorldcat::SFX
   include SFXWorldcat::Worldcat
 
-  ### First look for a DLC record for the e-ISSN given (first electronic, then print), then do the same for a print ISSN;
-  ### if not found in that way, move to LCCN (first electronic, then serial),
-  ### then loop back around and look for a non-DLC e-ISSN record cataloged in English, then a non-DLC print record cataloged in English;
+  ### First look for a DLC record for the e-ISSN given
+  ### (first electronic, then print), then do the same for a print ISSN;
+  ### if not found in that way, move to LCCN
+  ### (first electronic, then serial),
+  ### then loop back around and look for a non-DLC
+  ### e-ISSN record cataloged in English,
+  ### then a non-DLC print record cataloged in English;
   ### finally, look at the OCLC number
   def process_issn_el_object(identifiers)
     apis = 0

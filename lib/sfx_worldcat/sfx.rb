@@ -1,15 +1,7 @@
 require 'mysql2'
-
 module SFXWorldcat
   module SFX
     include SFXWorldcat::Queries
-
-    SFX_HOST = ENV['SFX_HOST']
-    SFX_PORT = ENV['SFX_PORT']
-    SFX_USER = ENV['SFX_USER']
-    SFX_PASS = ENV['SFX_PASS']
-    SFX_GLOBAL_DATABASE = ENV['SFX_GLOBAL_DATABASE']
-    SFX_LOCAL_DATABASE = ENV['SFX_LOCAL_DATABASE']
 
     def cjkr_languages
       %w[chi kor jpn rus]

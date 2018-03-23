@@ -1,8 +1,7 @@
 module SFXWorldcat
-
   include SFXWorldcat::SFX
 
-  def process_no_match(object_id, client)
+  def process_no_match(object_id, client, record_date)
     language = get_language(object_id, client)
     publishers = get_publishers(object_id, language, client)
     titles = get_titles(object_id, language, client)
@@ -75,7 +74,7 @@ module SFXWorldcat
     record.leader[17] = '5'
     record.append(MARC::ControlField.new('001', object_id))
     record.append(MARC::ControlField.new('003', 'SFX'))
-    field008_value = "#{RECORD_DATE}||||||||||xx || ||o||||||   ||#{language}||"
+    field008_value = "#{record_date}||||||||||xx || ||o||||||   ||#{language}||"
     record.append(MARC::ControlField.new('008', field008_value))
     ## 010-099
     unless lccns.empty?

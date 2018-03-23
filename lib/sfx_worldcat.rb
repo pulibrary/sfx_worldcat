@@ -4,6 +4,7 @@ require 'date'
 ROOT_DIR = File.join(File.dirname(__FILE__), '..')
 
 %w[
+  constants
   worldcat
   sfx_queries
   sfx

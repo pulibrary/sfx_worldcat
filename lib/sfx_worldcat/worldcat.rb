@@ -1,11 +1,5 @@
 module SFXWorldcat
-
-  module SFXWorldcat::Worldcat
-
-    WORLDCAT_URL = ENV['WORLDCAT_URL']
-    READ_URL = ENV['WORLDCAT_READ_URL']
-    WORLDCAT_API_KEY = ENV['WORLDCAT_API_KEY']
-
+  module Worldcat
     def worldcat_conn
       conn = Faraday.new(url: WORLDCAT_URL) do |faraday|
         faraday.request   :url_encoded

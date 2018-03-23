@@ -37,7 +37,7 @@ module SFXWorldcat
 
   def char_cleanup_array
     [
-      ["\u00c3\u00a2\u00e2\u201a\u00ac\u00e2\u20ac\u0153", "002d"],
+      ["\u00c3\u00a2\u00e2\u201a\u00ac\u00e2\u20ac\u0153", "\u002d"],
       ["\u00c3\u201e\\\\u0078\u0038\u0044", "\u010d"],
       ["\u00e1\u00b9\u00a3", "\u1e63"],
       ["\u00ef\u00a2\u0095", "\u00fc"],

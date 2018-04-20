@@ -80,7 +80,7 @@ remaining_objects = all_objects - processed_ids - local_objects - other_objects
 ## in a day
 api_count = 0
 remaining_objects.each do |object_id|
-  break if api_count > 180_000
+  break if api_count > 190_000
   result = get_rec(object_id, client)
   api_count += result[:api_count]
   case result[:rec_type]
@@ -125,9 +125,12 @@ File.open(processed_ids_file, 'w') do |output|
 end
 
 unless other_objects.empty?
+  brief_writer = MARC::Writer.new("#{ROOT_DIR}/output/full/brief_#{file_date}.mrc")
   File.open(no_match_file, 'w') do |output|
-    other_objects.each do |object|
-      output.puts(object)
-    end
+    other_objects.each do |object_id|
+      record = process_no_match(object_id, client, file_date)
+      brief_writer.write(record)
+      output.puts(object_id)
   end
+  brief_writer.close
 end

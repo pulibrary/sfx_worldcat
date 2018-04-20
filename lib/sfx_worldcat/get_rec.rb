@@ -175,5 +175,5 @@ module SFXWorldcat
     bib = local_reader.first
     fixed = process_bib_base(bib, object_id)
     { record: fixed, api_count: api_count, rec_type: 'local_rec'}
-  end   
+  end
 end

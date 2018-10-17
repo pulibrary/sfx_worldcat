@@ -1,5 +1,4 @@
 require_relative './../lib/sfx_worldcat'
-include SFXWorldcat
 
 client = Mysql2::Client.new(
   host: SFX_HOST,
@@ -9,7 +8,7 @@ client = Mysql2::Client.new(
   database: SFX_GLOBAL_DATABASE
 )
 
-file_date = Date.today.strftime('%Y-%m-%d')
+file_date = DateTime.now.strftime('%Y-%m-%d_%H%M')
 issn_el_writer = MARC::Writer.new("#{ROOT_DIR}/output/full/issn_el_#{file_date}.mrc")
 issn_print_writer = MARC::Writer.new("#{ROOT_DIR}/output/full/issn_print_#{file_date}.mrc")
 lccn_writer = MARC::Writer.new("#{ROOT_DIR}/output/full/lccn_#{file_date}.mrc")
@@ -53,16 +52,6 @@ else
   end
 end
 
-other_objects = Set.new
-no_match_file = "#{ROOT_DIR}/output/full/no_match.txt"
-if File.exist?(no_match_file)
-  File.open(no_match_file, 'r') do |input|
-    while line = input.gets
-      other_objects << line.chomp.to_i
-    end
-  end
-end
-
 processed_ids = Set.new
 processed_ids_file = "#{ROOT_DIR}/output/full/processed_ids.txt"
 if File.exist?(processed_ids_file)
@@ -73,14 +62,25 @@ if File.exist?(processed_ids_file)
   end
 end
 
-remaining_objects = all_objects - processed_ids - local_objects - other_objects
+no_match_file = "#{ROOT_DIR}/output/full/no_match.txt"
+if File.exist?(no_match_file)
+  File.open(no_match_file, 'r') do |input|
+    while line = input.gets
+      processed_ids << line.chomp.to_i
+    end
+  end
+end
+
+remaining_objects = all_objects - processed_ids - local_objects
+
+other_objects = Set.new
 
 ## There is a limit to the number
 ## of API calls one can make to Worldcat
 ## in a day
 api_count = 0
 remaining_objects.each do |object_id|
-  break if api_count > 190_000
+  break if api_count > 200_000
   result = get_rec(object_id, client)
   api_count += result[:api_count]
   case result[:rec_type]
@@ -126,11 +126,12 @@ end
 
 unless other_objects.empty?
   brief_writer = MARC::Writer.new("#{ROOT_DIR}/output/full/brief_#{file_date}.mrc")
-  File.open(no_match_file, 'w') do |output|
+  File.open(no_match_file, 'a') do |output|
     other_objects.each do |object_id|
       record = process_no_match(object_id, client, file_date)
       brief_writer.write(record)
       output.puts(object_id)
+    end
   end
   brief_writer.close
 end

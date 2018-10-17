@@ -7,7 +7,7 @@ module SFXWorldcat
     object_identifiers = get_identifiers(object_id, client)
     return { record: nil, api_count: api_count, rec_type: 'brief_rec' } if object_identifiers.empty?
     id_types = object_identifiers.map { |arr| { type: arr['type'], sub_type: arr['sub_type'] } }
-    if id_types.include?({ type: 'ISSN', sub_type: 'ELECTRONIC' })
+    if id_types.include?(type: 'ISSN', sub_type: 'ELECTRONIC')
       result = process_issn_el_object(object_identifiers)
       record_coll = result[0]
       api_count += result[1]
@@ -41,9 +41,9 @@ module SFXWorldcat
         end
       else
         fixed = process_bib_base(bib, object_id)
-        { record: fixed, api_count: api_count, rec_type: 'issn_el' }
+        return { record: fixed, api_count: api_count, rec_type: 'issn_el' }
       end
-    elsif id_types.include?({ type: 'ISSN', sub_type: 'PRINT' })
+    elsif id_types.include?(type: 'ISSN', sub_type: 'PRINT')
       result = process_issn_print_object(object_identifiers)
       record_coll = result[0]
       api_count += result[1]
@@ -83,7 +83,7 @@ module SFXWorldcat
         fixed = process_bib_base(bib, object_id)
         return { record: fixed, api_count: api_count, rec_type: 'issn_print' }
       end
-    elsif id_types.include?({ type: 'LCCN', sub_type: '' })
+    elsif id_types.include?(type: 'LCCN', sub_type: '')
       result = process_lccn_object(object_identifiers)
       record_coll = result[0]
       api_count += result[1]
@@ -123,7 +123,7 @@ module SFXWorldcat
         fixed = process_bib_base(bib, object_id)
         return { record: fixed, api_count: api_count, rec_type: 'lccn' }
       end
-    elsif id_types.include?({ type: 'OCLC_NR', sub_type: '' })
+    elsif id_types.include?(type: 'OCLC_NR', sub_type: '')
       result = process_oclc_object(object_identifiers)
       record_coll = result[0]
       api_count += result[1]
@@ -174,6 +174,6 @@ module SFXWorldcat
     local_reader = MARC::XMLReader.new(StringIO.new(record_coll))
     bib = local_reader.first
     fixed = process_bib_base(bib, object_id)
-    { record: fixed, api_count: api_count, rec_type: 'local_rec'}
+    { record: fixed, api_count: api_count, rec_type: 'local_rec' }
   end
 end

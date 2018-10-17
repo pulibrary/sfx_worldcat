@@ -207,7 +207,7 @@ module SFXWorldcat
       row = client.query(local_identifier_query(object_id)).first
       return nil unless row
       identifier = row['value']
-      identifier.gsub!(/^OCLC([0-9]+)$/, '\1')
+      identifier.gsub!(/OCLC|oclc/, '')
       identifier
     end
 

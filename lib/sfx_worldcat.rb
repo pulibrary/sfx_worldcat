@@ -15,3 +15,4 @@ ROOT_DIR = File.join(File.dirname(__FILE__), '..')
 ].each do |f|
   require_relative "sfx_worldcat/#{f}"
 end
+include SFXWorldcat

@@ -27,11 +27,11 @@ module SFXWorldcat
   ### Return array of title hash
   def get_titles(object_id, language, client)
     titles = get_raw_titles(object_id, client)
-    if cjkr_languages.include? language
-      titles = process_cjkr_titles(titles, language)
-    else
-      titles = process_noncjkr_titles(titles)
-    end
+    titles = if cjkr_languages.include?(language)
+               process_cjkr_titles(titles, language)
+             else
+               process_noncjkr_titles(titles)
+             end
     titles
   end
 
@@ -49,6 +49,15 @@ module SFXWorldcat
       ["\u00e2\u0080\u009d", "\u0022"],
       ["\u00e2\u0080\u009c", "\u0022"],
       ["\u00e2\u0080\u0093", "\u002d"],
+      ["\u00ed\u0095\u009c", "\ud55c"],
+      ["\u00ea\u00b5\u00ad", "\uad6d"],
+      ["\u00eb\u00a9\u0080", "\uba40"],
+      ["\u00ed\u008b\u00b0", "\ud2f0"],
+      ["\u00eb\u00af\u00b8", "\ubbf8"],
+      ["\u00eb\u0094\u0094", "\ub514"],
+      ["\u00ec\u0096\u00b4", "\uc5b4"],
+      ["\u00ed\u0095\u0099", "\ud559"],
+      ["\u00ed\u009a\u008c", "\ud68c"],
       ["\u00c3\u0081", "\u00c1"],
       ["\u00c3\u00a4", "\u00e4"],
       ["\u00c3\u00a0", "\u00e0"],
@@ -219,6 +228,8 @@ module SFXWorldcat
       ["\u00ca\u00bf", "\u02bf"],
       ["\u0b5c\u2019", "\u0312"],
       ["\u05c0\u2022", "\u0415"],
+      ["\u05c0\u2014", "\u0417"],
+      ["\u05c0\u009d", "\u041d"],
       ["\u05c0\u009f", "\u041f"],
       ["\u05c0\u00b0", "\u0430"],
       ["\u05c0\u00b1", "\u0431"],
@@ -295,11 +306,11 @@ module SFXWorldcat
   ### Return array of publisher hash
   def get_publishers(object_id, language, client)
     publishers = get_raw_publishers(object_id, client)
-    if cjkr_languages.include? language
-      publishers = process_cjkr_publishers(publishers, language)
-    else
-      publishers = process_noncjkr_publishers(publishers)
-    end
+    publishers = if cjkr_languages.include? language
+                   process_cjkr_publishers(publishers, language)
+                 else
+                   process_noncjkr_publishers(publishers)
+                 end
     publishers
   end
 
@@ -413,11 +424,15 @@ module SFXWorldcat
   end
 
   def process_main_title(main_title)
-    return nil unless main_title
     tag = '245'
     ind1 = '0'
-    ind2 = main_title[:non_filing].nil? ? '0' : main_title[:non_filing].to_s
-    field_value = main_title[:value]
+    ind2 = '0'
+    unless main_title.nil?
+      ind2 = main_title[:non_filing].nil? ? 0 : main_title[:non_filing]
+      ind2 = 0 if ind2 > 9
+      ind2 = ind2.to_s
+    end
+    field_value = main_title.nil? ? '[no title given]' : main_title[:value]
     field = MARC::DataField.new(tag, ind1, ind2, ['a', field_value], ['h', '[electronic resource]'])
     field
   end
@@ -450,10 +465,10 @@ module SFXWorldcat
     pub_field
   end
 
-  def issn_rec_test(record_coll, _issn)
+  def issn_rec_test(record_coll, issn)
     reader = MARC::XMLReader.new(StringIO.new(record_coll))
     target_record = reader.each do |record|
-      break record if record['040']['b'].nil? || record['040']['b'] == 'eng'
+      break record if (record['040']['b'].nil? || record['040']['b'] == 'eng') && (record['022']['a'] == issn || record['022']['l'] == issn)
     end
     record_coll = target_record.nil? ? nil : target_record.to_xml.to_s
     record_coll
@@ -525,6 +540,7 @@ module SFXWorldcat
       &svc_val_fmt=info:ofi/fmt:kev:mtx:sch_svc&).gsub(/[\s]+/, '')
     bib.append(MARC::DataField.new('856', '4', '0', %W[u #{url}], ['z', "View Princeton's online holdings"]))
     bib.append(MARC::DataField.new('910', ' ', ' ', %W[b (OCoLC)#{oclc_no}])) if is_match
+    bib = bad_utf8_fix(bib)
     bib = leaderfix(bib)
     bib = extra_space_fix(bib)
     bib = composed_chars_normalize(bib)
@@ -535,35 +551,44 @@ module SFXWorldcat
 
   def append_245h(bib)
     return bib unless bib['245']
-    subf_h = MARC::Subfield.new('h', '[electronic resource]')
     fixed = bib
     bib245 = fixed['245']
-    field_index = fixed.fields.index(bib245)
-    bib245.subfields.delete_if { |subfield| subfield.code == 'h' }
-    subf_codes = ''
-    bib245.subfields.each { |subfield| subf_codes << subfield.code }
-    subfa_index = subf_codes.index('a')
-    non_6anp_index = subf_codes.index(/[^6anp]/)
-    final_chars_subfa = bib245['a'][-2, 2]
-    if subf_codes =~ /^[6]*a[^np]|^[6]*a$/
-      case final_chars_subfa
-      when /[^.]\./
-        fixed.fields[field_index].subfields[subfa_index].value = bib245['a'][0..-2]
-        subf_h.value << '.'
-      when /[^ ][:\/;=]/
-        subf_h.value << " #{bib245['a'][-1]}"
-        fixed.fields[field_index].subfields[subfa_index].value = bib245['a'][0..-2]
-      when / [:\/;=]/
-        subf_h.value << final_chars_subfa
-        fixed.fields[field_index].subfields[subfa_index].value = bib245['a'][0..-3]
+    bib880 = fixed.fields('880')
+    bib880.select! { |field| field['6'] =~ /^245-/ }
+    fields_to_update = [bib245] + bib880
+    add_subfh_to_fields(fixed, fields_to_update)
+  end
+
+  def add_subfh_to_fields(bib, fields)
+    fields.each do |field|
+      subf_h = MARC::Subfield.new('h', '[electronic resource]')
+      field_index = bib.fields.index(field)
+      field.subfields.delete_if { |subfield| subfield.code == 'h' }
+      subf_codes = ''
+      field.subfields.each { |subfield| subf_codes << subfield.code }
+      subfa_index = subf_codes.index('a')
+      non_6anp_index = subf_codes.index(/[^6anp]/)
+      final_chars_subfa = field['a'][-2, 2]
+      if subf_codes =~ /^(6)?a[^np]|^(6)?a$/
+        case final_chars_subfa
+        when /[^.]\./
+          bib.fields[field_index].subfields[subfa_index].value = field['a'][0..-2]
+          subf_h.value << '.'
+        when /[^ ][:\/;=]/
+          subf_h.value << " #{field['a'][-1]}"
+          bib.fields[field_index].subfields[subfa_index].value = field['a'][0..-2]
+        when / [:\/;=]/
+          subf_h.value << final_chars_subfa
+          bib.fields[field_index].subfields[subfa_index].value = field['a'][0..-3]
+        end
+      end
+      if non_6anp_index
+        bib.fields[field_index].subfields.insert(non_6anp_index, subf_h)
+      else
+        bib.fields[field_index].subfields << subf_h
       end
     end
-    if non_6anp_index
-      fixed.fields[field_index].subfields.insert(non_6anp_index, subf_h)
-    else
-      fixed.fields[field_index].subfields << subf_h
-    end
-    fixed
+    bib
   end
 
   def process_050(bib)

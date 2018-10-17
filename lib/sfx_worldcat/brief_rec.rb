@@ -63,6 +63,7 @@ module SFXWorldcat
         alt_titles << title
       end
     end
+    main_title ||= alt_titles.shift
     main_title_field = process_main_title(main_title)
     ## Publisher pre-processing
     pub_field = process_publishers(publishers)
@@ -94,7 +95,7 @@ module SFXWorldcat
     end
 
     ## Title area
-    record.append(main_title_field) unless main_title_field.nil?
+    record.append(main_title_field)
     unless alt_titles.empty?
       alt_titles.each do |alt_title|
         next if alt_title[:value] == main_title[:value]
@@ -112,7 +113,6 @@ module SFXWorldcat
         record.append(field)
       end
     end
-
     record = process_bib_base(record, object_id)
     record
   end

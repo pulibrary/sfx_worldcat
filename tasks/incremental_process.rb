@@ -1,5 +1,4 @@
 require_relative './../lib/sfx_worldcat'
-include SFXWorldcat
 
 client = Mysql2::Client.new(
   host: SFX_HOST,

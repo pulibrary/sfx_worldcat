@@ -1,12 +1,10 @@
 GIT
   remote: git://github.com/pulibrary/marc_cleanup.git
-  revision: 8949baa06e6b0b720b53450c1eebed265d003076
-  tag: v0.6.0
+  revision: bf3bb32336681d7c507a2385422518b5f2b064ae
+  tag: v0.8.3
   specs:
-    marc_cleanup (0.6.0)
+    marc_cleanup (0.8.3)
       marc (~> 1.0)
-      net-sftp (~> 2.1)
-      rubyzip (~> 1.2)
 
 GEM
   remote: https://rubygems.org/
@@ -18,10 +16,6 @@ GEM
       unf
     multipart-post (2.0.0)
     mysql2 (0.5.0)
-    net-sftp (2.1.2)
-      net-ssh (>= 2.6.5)
-    net-ssh (4.2.0)
-    rubyzip (1.2.1)
     scrub_rb (1.0.1)
     unf (0.1.4)
       unf_ext
@@ -37,4 +31,4 @@ DEPENDENCIES
   mysql2
 
 BUNDLED WITH
-   1.14.6
+   1.16.5

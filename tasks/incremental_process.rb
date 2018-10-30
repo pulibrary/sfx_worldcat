@@ -7,8 +7,8 @@ client = Mysql2::Client.new(
   password: SFX_PASS,
   database: SFX_GLOBAL_DATABASE
 )
-
-file_date = Date.today.strftime('%Y-%m-%d')
+time = DateTime.now
+file_date = time.strftime('%Y-%m-%d')
 last_date = nil
 File.open("#{ROOT_DIR}/output/incremental/last_incremental_date.txt", 'r') do |input|
   last_date = input.gets.chomp
@@ -103,9 +103,12 @@ issn_alt_writer.close
 lccn_alt_writer.close
 oclc_alt_writer.close
 
-brief_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/brief_#{file_date}.mrc")
-other_objects.each do |object_id|
-  record = process_no_match(object_id, client, file_date)
-  brief_writer.write(record)
+unless other_objects.empty?
+  record_date = time.strftime('%Y%m%d')
+  brief_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/brief_#{file_date}.mrc")
+  other_objects.each do |object_id|
+    record = process_no_match(object_id, client, record_date)
+    brief_writer.write(record)
+  end
+  brief_writer.close
 end
-brief_writer.close

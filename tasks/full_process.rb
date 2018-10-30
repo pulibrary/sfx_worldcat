@@ -7,8 +7,8 @@ client = Mysql2::Client.new(
   password: SFX_PASS,
   database: SFX_GLOBAL_DATABASE
 )
-
-file_date = DateTime.now.strftime('%Y-%m-%d_%H%M')
+time = DateTime.now
+file_date = time.strftime('%Y-%m-%d_%H%M')
 issn_el_writer = MARC::Writer.new("#{ROOT_DIR}/output/full/issn_el_#{file_date}.mrc")
 issn_print_writer = MARC::Writer.new("#{ROOT_DIR}/output/full/issn_print_#{file_date}.mrc")
 lccn_writer = MARC::Writer.new("#{ROOT_DIR}/output/full/lccn_#{file_date}.mrc")
@@ -125,10 +125,11 @@ File.open(processed_ids_file, 'w') do |output|
 end
 
 unless other_objects.empty?
+  record_date = time.strftime('%Y%m%d')
   brief_writer = MARC::Writer.new("#{ROOT_DIR}/output/full/brief_#{file_date}.mrc")
   File.open(no_match_file, 'a') do |output|
     other_objects.each do |object_id|
-      record = process_no_match(object_id, client, file_date)
+      record = process_no_match(object_id, client, record_date)
       brief_writer.write(record)
       output.puts(object_id)
     end

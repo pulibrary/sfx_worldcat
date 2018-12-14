@@ -75,7 +75,7 @@ module SFXWorldcat
     record.leader[17] = '5'
     record.append(MARC::ControlField.new('001', object_id))
     record.append(MARC::ControlField.new('003', 'SFX'))
-    field008_value = "#{record_date}||||||||||xx || ||o||||||   ||#{language}||"
+    field008_value = "#{record_date}|||||||||xx || ||o||||||   ||#{language}||"
     record.append(MARC::ControlField.new('008', field008_value))
     ## 010-099
     unless lccns.empty?

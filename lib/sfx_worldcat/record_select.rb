@@ -32,51 +32,58 @@ module SFXWorldcat
     end
     record_coll = worldcat_sru(issn_first_query(issn_el_value), 5)
     apis += 1
-    record_coll = issn_rec_test(record_coll, issn_el_value) if record_coll
+    record_coll = issn_rec_test(record_coll, issn_el_value)
     unless record_coll
       record_coll = worldcat_sru(issn_second_query(issn_el_value), 5)
       apis += 1
-      record_coll = issn_rec_test(record_coll, issn_el_value) if record_coll
+      record_coll = issn_rec_test(record_coll, issn_el_value)
     end
     return [record_coll, apis] if record_coll
     if issn_print_value
       record_coll = worldcat_sru(issn_first_query(issn_print_value))
       apis += 1
-      record_coll = issn_rec_test(record_coll, issn_print_value) if record_coll
+      record_coll = issn_rec_test(record_coll, issn_print_value)
     end
     unless record_coll
       record_coll = worldcat_sru(issn_second_query(issn_print_value))
       apis += 1
-      record_coll = issn_rec_test(record_coll, issn_print_value) if record_coll
+      record_coll = issn_rec_test(record_coll, issn_print_value)
+    end
+    unless record_coll
+      record_coll = worldcat_sru(issn_third_query(issn_print_value))
+      apis += 1
+      record_coll = issn_rec_test(record_coll, issn_print_value)
     end
     return [record_coll, apis] if record_coll
     if lccn_value
       record_coll = worldcat_sru(lccn_first_query(lccn_value))
+      record_coll = lccn_rec_test(record_coll, lccn_value)
       apis += 1
       unless record_coll
         record_coll = worldcat_sru(lccn_second_query(lccn_value))
+        record_coll = lccn_rec_test(record_coll, lccn_value)
         apis += 1
       end
     end
     return [record_coll, apis] if record_coll
-    record_coll = worldcat_sru(issn_third_query(issn_el_value), 10)
+    record_coll = worldcat_sru(issn_fourth_query(issn_el_value), 10)
     apis += 1
-    record_coll = issn_rec_test(record_coll, issn_el_value) if record_coll
+    record_coll = issn_rec_test(record_coll, issn_el_value)
     return [record_coll, apis] if record_coll
     if issn_print_value
-      record_coll = worldcat_sru(issn_third_query(issn_print_value), 10)
+      record_coll = worldcat_sru(issn_fourth_query(issn_print_value), 10)
       apis += 1
-      record_coll = issn_rec_test(record_coll, issn_print_value) if record_coll
+      record_coll = issn_rec_test(record_coll, issn_print_value)
       unless record_coll
         record_coll = worldcat_sru(issn_final_query(issn_print_value), 10)
         apis += 1
-        record_coll = issn_rec_test(record_coll, issn_print_value) if record_coll
+        record_coll = issn_rec_test(record_coll, issn_print_value)
       end
     end
     return [record_coll, apis] if record_coll
     record_coll = worldcat_sru(issn_final_query(issn_el_value), 10)
     apis += 1
-    record_coll = issn_rec_test(record_coll, issn_el_value) if record_coll
+    record_coll = issn_rec_test(record_coll, issn_el_value)
     return [record_coll, apis] if record_coll
     if oclc_value
       record_coll = worldcat_sru(oclc_no_query(oclc_value))
@@ -111,29 +118,36 @@ module SFXWorldcat
     end
     record_coll = worldcat_sru(issn_first_query(issn_print_value))
     apis += 1
-    record_coll = issn_rec_test(record_coll, issn_print_value) if record_coll
+    record_coll = issn_rec_test(record_coll, issn_print_value)
     unless record_coll
       record_coll = worldcat_sru(issn_second_query(issn_print_value))
       apis += 1
-      record_coll = issn_rec_test(record_coll, issn_print_value) if record_coll
+      record_coll = issn_rec_test(record_coll, issn_print_value)
+    end
+    unless record_coll
+      record_coll = worldcat_sru(issn_third_query(issn_print_value))
+      apis += 1
+      record_coll = issn_rec_test(record_coll, issn_print_value)
     end
     return [record_coll, apis] if record_coll
     if lccn_value
       record_coll = worldcat_sru(lccn_first_query(lccn_value))
+      record_coll = lccn_rec_test(record_coll, lccn_value)
       apis += 1
       unless record_coll
         record_coll = worldcat_sru(lccn_second_query(lccn_value))
+        record_coll = lccn_rec_test(record_coll, lccn_value)
         apis += 1
       end
     end
     return [record_coll, apis] if record_coll
-    record_coll = worldcat_sru(issn_third_query(issn_print_value), 10)
+    record_coll = worldcat_sru(issn_fourth_query(issn_print_value), 10)
     apis += 1
-    record_coll = issn_rec_test(record_coll, issn_print_value) if record_coll
+    record_coll = issn_rec_test(record_coll, issn_print_value)
     unless record_coll
       record_coll = worldcat_sru(issn_final_query(issn_print_value), 10)
       apis += 1
-      record_coll = issn_rec_test(record_coll, issn_print_value) if record_coll
+      record_coll = issn_rec_test(record_coll, issn_print_value)
     end
     return [record_coll, apis] if record_coll
     if oclc_value
@@ -163,9 +177,11 @@ module SFXWorldcat
       end
     end
     record_coll = worldcat_sru(lccn_first_query(lccn_value))
+    record_coll = lccn_rec_test(record_coll, lccn_value)
     apis += 1
     unless record_coll
       record_coll = worldcat_sru(lccn_second_query(lccn_value))
+      record_coll = lccn_rec_test(record_coll, lccn_value)
       apis += 1
     end
     return [record_coll, apis] if record_coll
@@ -199,5 +215,29 @@ module SFXWorldcat
       record_coll = nil unless record['040']['b'].nil? || record['040']['b'] == 'eng'
     end
     [record_coll, apis]
+  end
+
+  ### Determine if an alternative record should be used based on encoding level;
+  ### return preferred record
+  def evaluate_alt_record(bib, test_bib)
+    orig_encoding = bib.leader[17]
+    test_encoding = test_bib.leader[17]
+    return bib if orig_encoding == ' ' && test_encoding != ' '
+    test_bib
+  end
+
+  ### Look for an alternative online record in the 776 fields
+  def get_alt_oclc(bib)
+    bib776 = bib.fields('776')
+    return nil if bib776.empty?
+    alt_oclc = nil
+    bib776.each do |field|
+      next unless field['i'] =~ /[Oo]nline version/
+      field.subfields.each do |subfield|
+        next unless subfield.value =~ /OCoLC/ && subfield.code == 'w'
+        alt_oclc = subfield.value.gsub(/^\(OCoLC\)([0-9]+)$/, '\1')
+      end
+    end
+    alt_oclc
   end
 end

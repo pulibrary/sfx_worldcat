@@ -1,9 +1,9 @@
 GIT
   remote: git://github.com/pulibrary/marc_cleanup.git
-  revision: bf3bb32336681d7c507a2385422518b5f2b064ae
-  tag: v0.8.3
+  revision: 7c6a349e5c3508902aad73b206527427d7380f6c
+  tag: v0.8.6
   specs:
-    marc_cleanup (0.8.3)
+    marc_cleanup (0.8.6)
       marc (~> 1.0)
 
 GEM

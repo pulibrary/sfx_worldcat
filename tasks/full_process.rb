@@ -125,7 +125,7 @@ File.open(processed_ids_file, 'w') do |output|
 end
 
 unless other_objects.empty?
-  record_date = time.strftime('%Y%m%d')
+  record_date = time.strftime('%y%m%d')
   brief_writer = MARC::Writer.new("#{ROOT_DIR}/output/full/brief_#{file_date}.mrc")
   File.open(no_match_file, 'a') do |output|
     other_objects.each do |object_id|

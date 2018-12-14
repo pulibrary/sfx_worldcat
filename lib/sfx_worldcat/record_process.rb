@@ -30,7 +30,7 @@ module SFXWorldcat
     titles = if cjkr_languages.include?(language)
                process_cjkr_titles(titles, language)
              else
-               process_noncjkr_titles(titles)
+               process_noncjkr_titles(titles, language)
              end
     titles
   end
@@ -38,6 +38,7 @@ module SFXWorldcat
   def char_cleanup_array
     [
       ["\u00c3\u00a2\u00e2\u201a\u00ac\u00e2\u20ac\u0153", "\u002d"],
+      ["\u00c3\u201e\u00c6\u2019\u00c3\u2026\u00c2\u00a3", "\u0103\u0163"],
       ["\u00c3\u201e\\\\u0078\u0038\u0044", "\u010d"],
       ["\u00e1\u00b8\u00a4", "\u1e24"],
       ["\u00e1\u00b8\u00a5", "\u1e25"],
@@ -58,46 +59,87 @@ module SFXWorldcat
       ["\u00ec\u0096\u00b4", "\uc5b4"],
       ["\u00ed\u0095\u0099", "\ud559"],
       ["\u00ed\u009a\u008c", "\ud68c"],
-      ["\u00c3\u0081", "\u00c1"],
-      ["\u00c3\u00a4", "\u00e4"],
-      ["\u00c3\u00a0", "\u00e0"],
       ["\u0065\u0094", "\u00e4"],
-      ["\u05d4", "\u00e4"],
       ["\u00bf\u006f", "\u006f\u0304"],
       ["\u00c4\u0083", "\u0103"],
       ["\u00c4\u0192", "\u0103"],
       ["\u05b4\u0192", "\u0103"],
+      ["\u00c3\u0081", "\u00c1"],
+      ["\u00c3\u0082", "\u00c2"],
+      ["\u00c3\u0083", "\u00c3"],
+      ["\u00c3\u0084", "\u00c4"],
+      ["\u00c3\u0085", "\u00c5"],
+      ["\u00c3\u0086", "\u00c6"],
+      ["\u00c3\u0087", "\u00c7"],
+      ["\u00c3\u0088", "\u00c8"],
+      ["\u00c3\u0089", "\u00c9"],
+      ["\u00c3\u008a", "\u00ca"],
+      ["\u00c3\u008b", "\u00cb"],
+      ["\u00c3\u008c", "\u00cc"],
+      ["\u00c3\u008d", "\u00cd"],
+      ["\u00c3\u008e", "\u00ce"],
+      ["\u00c3\u008f", "\u00cf"],
+      ["\u00c3\u0090", "\u00d0"],
+      ["\u00c3\u0091", "\u00d1"],
+      ["\u00c3\u0092", "\u00d2"],
+      ["\u00c3\u0093", "\u00d3"],
+      ["\u00c3\u0094", "\u00d4"],
+      ["\u00c3\u0095", "\u00d5"],
+      ["\u00c3\u0096", "\u00d6"],
+      ["\u00c3\u0097", "\u00d7"],
+      ["\u00c3\u0098", "\u00d8"],
+      ["\u00c3\u0099", "\u00d9"],
+      ["\u00c3\u009a", "\u00da"],
+      ["\u00c3\u009b", "\u00db"],
+      ["\u00c3\u009c", "\u00dc"],
+      ["\u00c3\u009d", "\u00dd"],
+      ["\u00c3\u009e", "\u00de"],
+      ["\u00c3\u009f", "\u00df"],
+      ["\u00c3\u00a0", "\u00e0"],
       ["\u00c3\u00a1", "\u00e1"],
-      ["\u0065\u0098", "\u00e8"],
+      ["\u00c3\u00a2", "\u00e2"],
+      ["\u00c3\u00a3", "\u00e3"],
+      ["\u00c3\u00a4", "\u00e4"],
+      ["\u00c3\u00a5", "\u00e5"],
+      ["\u00c3\u00a6", "\u00e6"],
+      ["\u00c3\u00a7", "\u00e7"],
       ["\u00c3\u00a8", "\u00e8"],
-      ["\u05d8", "\u00e8"],
-      ["\u05d9", "\u00e9"],
+      ["\u00c3\u00a9", "\u00e9"],
+      ["\u00c3\u00aa", "\u00ea"],
+      ["\u00c3\u00ab", "\u00eb"],
+      ["\u00c3\u00ac", "\u00ec"],
+      ["\u00c3\u00ad", "\u00ed"],
+      ["\u00c3\u00ae", "\u00ee"],
+      ["\u00c3\u00af", "\u00ef"],
+      ["\u00c3\u00b0", "\u00f0"],
+      ["\u00c3\u00b1", "\u00f1"],
+      ["\u00c3\u00b3", "\u00f3"],
+      ["\u00c3\u00b4", "\u00f4"],
+      ["\u00c3\u00b5", "\u00f5"],
+      ["\u00c3\u00b6", "\u00f6"],
+      ["\u00c3\u00b7", "\u00f7"],
+      ["\u00c3\u00b8", "\u00f8"],
+      ["\u00c3\u00b9", "\u00f9"],
+      ["\u00c3\u00ba", "\u00fa"],
+      ["\u00c3\u00bb", "\u00fb"],
+      ["\u00c3\u00bc", "\u00fc"],
+      ["\u00c3\u00bd", "\u00fd"],
+      ["\u00c3\u00be", "\u00fe"],
+      ["\u00c3\u00bf", "\u00ff"],
+      ["\u0065\u0098", "\u00e8"],
       ["\u00c3\u2030", "\u00e9"],
       ["\u00d7\u0099", "\u00e9"],
       ["\u0065\u0099", "\u00e9"],
-      ["\u00c3\u00a9", "\u00e9"],
-      ["\u05da", "\u00ea"],
       ["\u0065\u009a", "\u00ea"],
-      ["\u00c3\u00aa", "\u00ea"],
-      ["\u05d7", "\u00e7"],
       ["\u0065\u0097", "\u00e7"],
-      ["\u00c3\u00a7", "\u00e7"],
       ["\u00c4\u008d", "\u010d"],
-      ["\u05dd", "\u00ed"],
       ["\u0065\u009d", "\u00ed"],
-      ["\u00c3\u00ad", "\u00ed"],
       ["\u00c3\u008d", "\u0049\u0301"],
       ["\u00c5\u017e", "\u015e"],
       ["\u00c5\u009e", "\u015e"],
-      ["\uf895", "\u00fc"],
       ["\u00c5\u00a3", "\u0163"],
-      ["\u00c3\u00bc", "\u00fc"],
       ["\u00c3\u00ba", "\u0075\u0301"],
       ["\u00c3\u0161", "\u00da"],
-      ["\u00c3\u0098", "\u00d8"],
-      ["\u00c3\u00b8", "\u00f8"],
-      ["\u2013", "\u002d"],
-      ["\u00c3\u201e\u00c6\u2019\u00c3\u2026\u00c2\u00a3", "\u0103\u0163"],
       ["\u00c5\u009f", "\u015f"],
       ["\u00c3\u009f", "\u0073\u0073"],
       ["\u00d0\u0093", "\u0413"],
@@ -154,15 +196,6 @@ module SFXWorldcat
       ["\u00d1\u008b", "\u044b"],
       ["\u00d1\u008c", "\u044c"],
       ["\u00d1\u009a", "\u045a"],
-      ["\u00c3\u00b3", "\u00f3"],
-      ["\u00c3\u00b4", "\u00f4"],
-      ["\u00c3\u00b5", "\u00f5"],
-      ["\u00c3\u00b6", "\u00f6"],
-      ["\u00c3\u00b7", "\u00f7"],
-      ["\u00c3\u00b8", "\u00f8"],
-      ["\u00c3\u00b9", "\u00f9"],
-      ["\u00c3\u00ba", "\u00fa"],
-      ["\u00c3\u00bb", "\u00fb"],
       ["\u05b3\u00bc", "\u00fc"],
       ["\\?\u0081", "\u0101"],
       ["\u00c4\u0081", "\u0101"],
@@ -260,14 +293,22 @@ module SFXWorldcat
       ["\u0098", ''],
       ["\u009c", ''],
       ["\u00bb", '"'],
-      ["\u0094", '']
+      ["\u0094", ''],
+      ["\u05d4", "\u00e4"],
+      ["\u05d7", "\u00e7"],
+      ["\u05d8", "\u00e8"],
+      ["\u05d9", "\u00e9"],
+      ["\u05da", "\u00ea"],
+      ["\u05dd", "\u00ed"],
+      ["\u2013", "\u002d"],
+      ["\uf895", "\u00fc"]
     ]
   end
 
-  def process_noncjkr_titles(titles)
+  def process_noncjkr_titles(titles, language)
     fixed_titles = []
     titles.each do |title|
-      title[:value] = noncjkr_string_value_cleanup(title[:value])
+      title[:value] = noncjkr_string_value_cleanup(title[:value], language)
       fixed_titles << title
     end
     fixed_titles.uniq
@@ -285,10 +326,11 @@ module SFXWorldcat
     fixed_titles.uniq
   end
 
-  def noncjkr_string_value_cleanup(string)
+  def noncjkr_string_value_cleanup(string, language)
     return nil unless string
     fixed_value = string
     char_cleanup_array.each do |array|
+      next if language == 'heb' && array[0] =~ /[\u0591-\u05f4]/
       fixed_value.gsub!(/#{array[0]}/, array[1])
     end
     fixed_value
@@ -309,7 +351,7 @@ module SFXWorldcat
     publishers = if cjkr_languages.include? language
                    process_cjkr_publishers(publishers, language)
                  else
-                   process_noncjkr_publishers(publishers)
+                   process_noncjkr_publishers(publishers, language)
                  end
     publishers
   end
@@ -328,11 +370,11 @@ module SFXWorldcat
     fixed_publishers.uniq
   end
 
-  def process_noncjkr_publishers(publishers)
+  def process_noncjkr_publishers(publishers, language)
     fixed_publishers = []
     publishers.each do |publisher|
-      publisher[:name] = noncjkr_string_value_cleanup(publisher[:name])
-      publisher[:place] = noncjkr_string_value_cleanup(publisher[:place])
+      publisher[:name] = noncjkr_string_value_cleanup(publisher[:name], language)
+      publisher[:place] = noncjkr_string_value_cleanup(publisher[:place], language)
       fixed_publishers << publisher
     end
     fixed_publishers.uniq
@@ -466,9 +508,22 @@ module SFXWorldcat
   end
 
   def issn_rec_test(record_coll, issn)
+    return record_coll if record_coll.nil?
     reader = MARC::XMLReader.new(StringIO.new(record_coll))
     target_record = reader.each do |record|
       break record if (record['040']['b'].nil? || record['040']['b'] == 'eng') && (record['022']['a'] == issn || record['022']['l'] == issn)
+    end
+    record_coll = target_record.nil? ? nil : target_record.to_xml.to_s
+    record_coll
+  end
+
+  def lccn_rec_test(record_coll, lccn)
+    return record_coll if record_coll.nil?
+    test_lccn = lccn.gsub(/[^0-9a-zA-Z]/, '')
+    reader = MARC::XMLReader.new(StringIO.new(record_coll))
+    target_record = reader.each do |record|
+      break record if (record['040']['b'].nil? || record['040']['b'] == 'eng') &&
+        record['010']['a'].gsub(/[^0-9a-zA-Z]/, '') == test_lccn
     end
     record_coll = target_record.nil? ? nil : target_record.to_xml.to_s
     record_coll
@@ -479,13 +534,17 @@ module SFXWorldcat
       003
       006
       007
-      019
-      856
+      015
+      016
       029
       035
       037
       049
+      055
       060
+      070
+      071
+      072
       084
       090
       263
@@ -502,17 +561,84 @@ module SFXWorldcat
       653
       658
       752
+      850
       853
       863
-      938
-      936
-      850
+      856
+      866
+      891
     ]
+  end
+
+  ## Sort by first digit of tag;
+  ## place 090 before any fields right after that;
+  ## same with 856, 33x, 856, and 880
+  def sort_fields(bib)
+    index_090 = bib.fields.index { |field| field.tag.to_i > 90 }
+    index_33x = bib.fields.index { |field| field.tag.to_i > 338 }
+    index_856 = bib.fields.index { |field| field.tag.to_i > 856 }
+    index_880 = bib.fields.index { |field| field.tag.to_i > 880 }
+    f0xx = bib.fields('001'..'099')
+    new_rec = MARC::Record.new
+    new_rec.leader = bib.leader
+    bib.fields('001'..'089').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('090').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('091'..'099').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('100'..'199').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('200'..'299').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('300'..'335').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('336'..'338').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('339'..'399').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('400'..'499').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('500'..'599').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('600'..'699').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('700'..'799').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('800'..'855').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('856').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('857'..'879').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('880').each do |field|
+      new_rec.append(field)
+    end
+    bib.fields('881'..'999').each do |field|
+      new_rec.append(field)
+    end
+    new_rec
   end
 
   def process_bib_base(bib, object_id)
     is_match = bib['003'].nil? || bib['003'].value != 'SFX'
     bib = field_delete(fields_to_delete, bib)
+    bib = field_delete(('900'..'999').to_a, bib)
     oclc_no = bib['001'].value
     bib['001'].value = object_id.to_s
     bib.fields.insert(1, MARC::ControlField.new('003', 'SFX'))
@@ -520,16 +646,16 @@ module SFXWorldcat
     bib.fields.insert(3, MARC::ControlField.new('007', 'cr |n|||||||||'))
     bib = process_050(bib)
     bib = process_082(bib)
-    bib.append(MARC::DataField.new('090', ' ', ' ', ['a', 'Electronic Resource']))
+    bib = process_130(bib)
     bib = process_210(bib)
+    bib = process_222(bib)
     bib = append_245h(bib)
-    bib.append(MARC::DataField.new('336', ' ', ' ', %w[a text], %w[b txt], %w[2 rdacontent]))
-    bib.append(MARC::DataField.new('337', ' ', ' ', %w[a computer], %w[b c], %w[2 rdamedia]))
-    bib.append(MARC::DataField.new('338', ' ', ' ', ['a', 'online resource'], %w[b cr], %w[2 rdacarrier]))
+    bib = process_246(bib)
     bib = process_533(bib)
     bib = process_530(bib)
     bib = process_6xx(bib)
     bib = process_776(bib)
+    bib = process_880(bib)
     url = %(https://getit.princeton.edu/resolve?url_ver=Z39.88-2004
       &ctx_ver=Z39.88-2004
       &ctx_enc=info:ofi/enc:UTF-8
@@ -538,6 +664,10 @@ module SFXWorldcat
       &sfx.ignore_date_threshold=1
       &rft.object_id=#{object_id}
       &svc_val_fmt=info:ofi/fmt:kev:mtx:sch_svc&).gsub(/[\s]+/, '')
+    bib.append(MARC::DataField.new('090', ' ', ' ', ['a', 'Electronic Resource']))
+    bib.append(MARC::DataField.new('336', ' ', ' ', %w[a text], %w[b txt], %w[2 rdacontent]))
+    bib.append(MARC::DataField.new('337', ' ', ' ', %w[a computer], %w[b c], %w[2 rdamedia]))
+    bib.append(MARC::DataField.new('338', ' ', ' ', ['a', 'online resource'], %w[b cr], %w[2 rdacarrier]))
     bib.append(MARC::DataField.new('856', '4', '0', %W[u #{url}], ['z', "View Princeton's online holdings"]))
     bib.append(MARC::DataField.new('910', ' ', ' ', %W[b (OCoLC)#{oclc_no}])) if is_match
     bib = bad_utf8_fix(bib)
@@ -546,6 +676,8 @@ module SFXWorldcat
     bib = composed_chars_normalize(bib)
     bib = tab_newline_fix(bib)
     bib = empty_subfield_fix(bib)
+    bib = fix_008(bib)
+    bib = sort_fields(bib)
     bib
   end
 
@@ -616,6 +748,12 @@ module SFXWorldcat
     fixed
   end
 
+  def process_130(bib)
+    return bib unless bib['130'] && bib['130']['a']
+    bib['130']['a'].gsub!(/CD\-ROM/, 'Online')
+    bib
+  end
+
   def process_210(bib)
     return bib if bib.fields('210').empty?
     fixed = bib
@@ -629,17 +767,33 @@ module SFXWorldcat
     fixed
   end
 
+  def process_222(bib)
+    return bib unless bib['222'] && bib['222']['b']
+    bib['222']['b'].gsub!(/CD\-ROM/, 'Online')
+    bib
+  end
+
   def process_246(bib)
     return bib if bib.fields('246').empty?
     valid_ind1 = %w[0 1 2 3]
-    fixed = bib
-    target_fields = fixed.fields('246')
+    target_fields = bib.fields('246')
+    field_array = []
     target_fields.each do |field|
-      next if valid_ind1.include? field.indicator1
-      field_index = fixed.fields.index(field)
-      fixed.fields[field_index].indicator1 = '1'
+      field_index = bib.fields.index(field)
+      bib.fields[field_index].indicator1 = '1' unless valid_ind1.include? field.indicator1
+      field_string = ''
+      field.subfields.each do |subfield|
+        next if subfield.code == '6'
+        field_string << subfield.code
+        field_string << subfield.value
+      end
+      if field_array.include?(field_string)
+        bib.fields.delete_at(field_index)
+      else
+        field_array << field_string
+      end
     end
-    fixed
+    bib
   end
 
   def process_533(bib)
@@ -669,25 +823,24 @@ module SFXWorldcat
   def process_6xx(bib)
     return bib if bib.fields('600'..'699').empty?
     wanted_sources = %w[lcgft fast]
-    fixed = bib
-    subject_fields = fixed.fields('600'..'699')
-    subject_fields.each do |subject|
+    subject_fields = bib.fields('600'..'699')
+    subject_fields.each do |field|
       del = false
-      if %w[0 7].include? subject.indicator2
-        if subject.indicator2 == '7' && (wanted_sources.include? subject['2'] == false)
+      if %w[0 7].include?(field.indicator2)
+        if field.indicator2 == '7' && !wanted_sources.include?(field['2'])
           del = true
-        elsif subject['a'] =~ /^[Ee]lectronic journals/
+        elsif field['a'] =~ /^[Ee]lectronic journals/
           del = true
         end
       else
         del = true
       end
       if del
-        field_index = fixed.fields.index(subject)
-        fixed.fields.delete_at(field_index)
+        field_index = bib.fields.index(field)
+        bib.fields.delete_at(field_index)
       end
     end
-    fixed
+    bib
   end
 
   def process_776(bib)
@@ -700,10 +853,34 @@ module SFXWorldcat
       field_index = fixed.fields.index(field)
       if field.to_s =~ /Online version/
         fixed.fields.delete_at(field_index)
+      elsif field.indicator1 == ' ' && field.indicator2 == ' '
+        fixed.fields[field_index].indicator1 = '0'
+        fixed.fields[field_index].indicator2 = '8'
       else
         fixed.fields[field_index].indicator1 = '0'
       end
     end
     fixed
   end
+end
+
+def process_880(bib)
+  return bib if bib.fields('880').empty?
+  rec_fields = bib.fields.map { |field| field.tag }
+  f880 = bib.fields('880')
+  f880.each do |field|
+    field_index = bib.fields.index(field)
+    del = false
+    f6 = field['6']
+    if f6.nil?
+      del = true
+    else
+      f_num = f6.gsub(/^([0-9]{3})\-.*$/, '\1')
+      f_index = f6.gsub(/^[0-9]{3}\-([0-9]+).*$/, '\1')
+      del = true unless rec_fields.include?(f_num) || f_num[0] == '5'
+      del = true if !rec_fields.include?(f_num) && f_num[0] == '5' && f_index != '00'
+    end
+    bib.fields.delete_at(field_index) if del
+  end
+  bib
 end

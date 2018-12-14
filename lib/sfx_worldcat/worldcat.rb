@@ -32,31 +32,39 @@ module SFXWorldcat
     end
 
     def oclc_no_query(oclc_no)
-      "srw.no any \"#{oclc_no}\" and srw.mt any \"ser\""
+      "srw.no any \"#{oclc_no}\" and srw.mt any \"cnr\""
     end
 
     def issn_first_query(issn)
-      "srw.in any \"#{issn}\" and srw.pc any \"Y\" and srw.mt all \"com ser\""
+      "srw.in any \"#{issn}\" and srw.pc any \"Y\" and srw.mt all \"com cnr\""
     end
 
     def issn_second_query(issn)
-      "srw.in any \"#{issn}\" and srw.pc any \"Y\" and srw.mt any \"ser\""
+      "srw.in any \"#{issn}\" and srw.li any \"PUL\" and srw.mt any \"cnr\""
     end
 
     def issn_third_query(issn)
-      "srw.in any \"#{issn}\" and srw.mt all \"com ser\""
+      "srw.in any \"#{issn}\" and srw.pc any \"Y\" and srw.mt any \"cnr\""
+    end
+
+    def issn_fourth_query(issn)
+      "srw.in any \"#{issn}\" and srw.mt all \"com cnr\""
     end
 
     def issn_final_query(issn)
-      "srw.in any \"#{issn}\" and srw.mt any \"ser\""
+      "srw.in any \"#{issn}\" and srw.mt any \"cnr\""
     end
 
     def lccn_first_query(lccn)
-      "srw.dn any \"#{lccn}\" and srw.pc any \"Y\" and srw.mt all \"com ser\""
+      "srw.dn any \"#{lccn}\" and srw.pc any \"Y\" and srw.mt all \"com cnr\""
     end
 
     def lccn_second_query(lccn)
-      "srw.dn any \"#{lccn}\" and srw.pc any \"Y\" and srw.mt any \"ser\""
+      "srw.dn any \"#{lccn}\" and srw.pc any \"Y\" and srw.li any \"PUL\" and srw.mt any \"cnr\""
+    end
+
+    def lccn_third_query(lccn)
+      "srw.dn any \"#{lccn}\" and srw.pc any \"Y\" and srw.mt any \"cnr\""
     end
   end
 end

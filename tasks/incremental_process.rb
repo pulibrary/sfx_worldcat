@@ -104,7 +104,7 @@ lccn_alt_writer.close
 oclc_alt_writer.close
 
 unless other_objects.empty?
-  record_date = time.strftime('%Y%m%d')
+  record_date = time.strftime('%y%m%d')
   brief_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/brief_#{file_date}.mrc")
   other_objects.each do |object_id|
     record = process_no_match(object_id, client, record_date)

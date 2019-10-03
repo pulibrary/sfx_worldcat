@@ -1,6 +1,4 @@
 module SFXWorldcat
-  include SFXWorldcat::SFX
-  include SFXWorldcat::Worldcat
 
   def get_rec(object_id, client)
     api_count = 0

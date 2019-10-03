@@ -1,9 +1,6 @@
 require 'marc'
-require 'marc_cleanup'
 
 module SFXWorldcat
-  include SFXWorldcat::SFX
-
   def process_related_objects(object_id, client)
     related_objects = get_related_objects(object_id, client)
     return related_objects if related_objects.empty?
@@ -45,20 +42,22 @@ module SFXWorldcat
       ["\u00e1\u00b9\u00a3", "\u1e63"],
       ["\u00e1\u00b9\u00ad", "\u1e6d"],
       ["\u00e1\u00b9\u00af", "\u1e6f"],
-      ["\u00ef\u00a2\u0095", "\u00fc"],
       ["\u00e2\u0080\u009e", "\u0022"],
       ["\u00e2\u0080\u009d", "\u0022"],
       ["\u00e2\u0080\u009c", "\u0022"],
       ["\u00e2\u0080\u0093", "\u002d"],
-      ["\u00ed\u0095\u009c", "\ud55c"],
       ["\u00ea\u00b5\u00ad", "\uad6d"],
-      ["\u00eb\u00a9\u0080", "\uba40"],
-      ["\u00ed\u008b\u00b0", "\ud2f0"],
-      ["\u00eb\u00af\u00b8", "\ubbf8"],
+      ["\u00eb\u008c\u0080", "\ub300"],
       ["\u00eb\u0094\u0094", "\ub514"],
+      ["\u00eb\u00a9\u0080", "\uba40"],
+      ["\u00eb\u00af\u00b8", "\ubbf8"],
+      ["\u00ec\u00b9\u00a8", "\uad6c"],
       ["\u00ec\u0096\u00b4", "\uc5b4"],
+      ["\u00ed\u0095\u009c", "\ud55c"],
+      ["\u00ed\u008b\u00b0", "\ud2f0"],
       ["\u00ed\u0095\u0099", "\ud559"],
       ["\u00ed\u009a\u008c", "\ud68c"],
+      ["\u00ef\u00a2\u0095", "\u00fc"],
       ["\u0065\u0094", "\u00e4"],
       ["\u00bf\u006f", "\u006f\u0304"],
       ["\u00c4\u0083", "\u0103"],
@@ -475,7 +474,9 @@ module SFXWorldcat
       ind2 = ind2.to_s
     end
     field_value = main_title.nil? ? '[no title given]' : main_title[:value]
-    field = MARC::DataField.new(tag, ind1, ind2, ['a', field_value], ['h', '[electronic resource]'])
+    field = MARC::DataField.new(tag, ind1, ind2,
+                                ['a', field_value],
+                                ['h', '[electronic resource]'])
     field
   end
 
@@ -511,7 +512,8 @@ module SFXWorldcat
     return record_coll if record_coll.nil?
     reader = MARC::XMLReader.new(StringIO.new(record_coll))
     target_record = reader.each do |record|
-      break record if (record['040']['b'].nil? || record['040']['b'] == 'eng') && (record['022']['a'] == issn || record['022']['l'] == issn)
+      break record if (record['040']['b'].nil? || record['040']['b'] == 'eng') &&
+                      (record['022']['a'] == issn || record['022']['l'] == issn)
     end
     record_coll = target_record.nil? ? nil : target_record.to_xml.to_s
     record_coll
@@ -523,7 +525,7 @@ module SFXWorldcat
     reader = MARC::XMLReader.new(StringIO.new(record_coll))
     target_record = reader.each do |record|
       break record if (record['040']['b'].nil? || record['040']['b'] == 'eng') &&
-        record['010']['a'].gsub(/[^0-9a-zA-Z]/, '') == test_lccn
+                      record['010']['a'].gsub(/[^0-9a-zA-Z]/, '') == test_lccn
     end
     record_coll = target_record.nil? ? nil : target_record.to_xml.to_s
     record_coll
@@ -556,7 +558,9 @@ module SFXWorldcat
       506
       510
       516
+      533
       538
+      540
       583
       653
       658
@@ -574,11 +578,6 @@ module SFXWorldcat
   ## place 090 before any fields right after that;
   ## same with 856, 33x, 856, and 880
   def sort_fields(bib)
-    index_090 = bib.fields.index { |field| field.tag.to_i > 90 }
-    index_33x = bib.fields.index { |field| field.tag.to_i > 338 }
-    index_856 = bib.fields.index { |field| field.tag.to_i > 856 }
-    index_880 = bib.fields.index { |field| field.tag.to_i > 880 }
-    f0xx = bib.fields('001'..'099')
     new_rec = MARC::Record.new
     new_rec.leader = bib.leader
     bib.fields('001'..'089').each do |field|
@@ -635,7 +634,7 @@ module SFXWorldcat
     new_rec
   end
 
-  def process_bib_base(bib, object_id)
+  def process_bib_base(bib, object_id, dict)
     is_match = bib['003'].nil? || bib['003'].value != 'SFX'
     bib = field_delete(fields_to_delete, bib)
     bib = field_delete(('900'..'999').to_a, bib)
@@ -651,7 +650,6 @@ module SFXWorldcat
     bib = process_222(bib)
     bib = append_245h(bib)
     bib = process_246(bib)
-    bib = process_533(bib)
     bib = process_530(bib)
     bib = process_6xx(bib)
     bib = process_776(bib)
@@ -664,13 +662,29 @@ module SFXWorldcat
       &sfx.ignore_date_threshold=1
       &rft.object_id=#{object_id}
       &svc_val_fmt=info:ofi/fmt:kev:mtx:sch_svc&).gsub(/[\s]+/, '')
-    bib.append(MARC::DataField.new('090', ' ', ' ', ['a', 'Electronic Resource']))
-    bib.append(MARC::DataField.new('336', ' ', ' ', %w[a text], %w[b txt], %w[2 rdacontent]))
-    bib.append(MARC::DataField.new('337', ' ', ' ', %w[a computer], %w[b c], %w[2 rdamedia]))
-    bib.append(MARC::DataField.new('338', ' ', ' ', ['a', 'online resource'], %w[b cr], %w[2 rdacarrier]))
-    bib.append(MARC::DataField.new('856', '4', '0', %W[u #{url}], ['z', "View Princeton's online holdings"]))
-    bib.append(MARC::DataField.new('910', ' ', ' ', %W[b (OCoLC)#{oclc_no}])) if is_match
+    bib.append(MARC::DataField.new('090', ' ', ' ',
+                                   ['a', 'Electronic Resource']))
+    bib.append(MARC::DataField.new('336', ' ', ' ',
+                                   %w[a text],
+                                   %w[b txt],
+                                   %w[2 rdacontent]))
+    bib.append(MARC::DataField.new('337', ' ', ' ',
+                                   %w[a computer],
+                                   %w[b c],
+                                   %w[2 rdamedia]))
+    bib.append(MARC::DataField.new('338', ' ', ' ',
+                                   ['a', 'online resource'],
+                                   %w[b cr],
+                                   %w[2 rdacarrier]))
+    bib.append(MARC::DataField.new('856', '4', '0',
+                                   %W[u #{url}],
+                                   ['z', "View Princeton's online holdings"]))
+    if is_match
+      bib.append(MARC::DataField.new('910', ' ', ' ',
+                                     %W[b (OCoLC)#{oclc_no}]))
+    end
     bib = bad_utf8_fix(bib)
+    bib = invalid_xml_fix(bib)
     bib = leaderfix(bib)
     bib = extra_space_fix(bib)
     bib = composed_chars_normalize(bib)
@@ -678,6 +692,7 @@ module SFXWorldcat
     bib = empty_subfield_fix(bib)
     bib = fix_008(bib)
     bib = sort_fields(bib)
+    bib = process_chinese_record(bib, dict)
     bib
   end
 
@@ -849,7 +864,7 @@ module SFXWorldcat
     fixed = bib
     target_fields = fixed.fields('776')
     target_fields.each do |field|
-      next unless valid_ind1.include?(field.indicator1) || field.to_s =~ /Online/
+      next unless !valid_ind1.include?(field.indicator1) || field.to_s =~ /Online/
       field_index = fixed.fields.index(field)
       if field.to_s =~ /Online version/
         fixed.fields.delete_at(field_index)
@@ -866,7 +881,7 @@ end
 
 def process_880(bib)
   return bib if bib.fields('880').empty?
-  rec_fields = bib.fields.map { |field| field.tag }
+  rec_fields = bib.fields.map(&:tag)
   f880 = bib.fields('880')
   f880.each do |field|
     field_index = bib.fields.index(field)
@@ -878,7 +893,9 @@ def process_880(bib)
       f_num = f6.gsub(/^([0-9]{3})\-.*$/, '\1')
       f_index = f6.gsub(/^[0-9]{3}\-([0-9]+).*$/, '\1')
       del = true unless rec_fields.include?(f_num) || f_num[0] == '5'
-      del = true if !rec_fields.include?(f_num) && f_num[0] == '5' && f_index != '00'
+      del = true if !rec_fields.include?(f_num) &&
+                    f_num[0] == '5' &&
+                    f_index != '00'
     end
     bib.fields.delete_at(field_index) if del
   end

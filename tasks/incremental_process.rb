@@ -10,19 +10,20 @@ client = Mysql2::Client.new(
 time = DateTime.now
 file_date = time.strftime('%Y-%m-%d')
 last_date = nil
-File.open("#{ROOT_DIR}/output/incremental/last_incremental_date.txt", 'r') do |input|
+output_dir = "#{ROOT_DIR}/output/incremental"
+File.open("#{output_dir}/last_incremental_date.txt", 'r') do |input|
   last_date = input.gets.chomp
 end
 
 current_objects = get_current_objects(client)
-current_id_file = "#{ROOT_DIR}/output/incremental/ids_#{file_date}.txt"
+current_id_file = "#{output_dir}/ids_#{file_date}.txt"
 File.open(current_id_file, 'w') do |output|
   current_objects.each do |object|
     output.puts(object)
   end
 end
 previous_objects = Set.new
-prev_id_file = "#{ROOT_DIR}/output/incremental/ids_#{last_date}.txt"
+prev_id_file = "#{output_dir}/ids_#{last_date}.txt"
 File.open(prev_id_file, 'r') do |input|
   while line = input.gets
     previous_objects << line.chomp.to_i
@@ -30,7 +31,7 @@ File.open(prev_id_file, 'r') do |input|
 end
 
 deleted_objects = previous_objects - current_objects
-deleted_obj_file = "#{ROOT_DIR}/output/incremental/deletes_since_#{last_date}.txt"
+deleted_obj_file = "#{output_dir}/deletes_since_#{last_date}.txt"
 File.open(deleted_obj_file, 'w') do |output|
   deleted_objects.each do |object|
     output.puts("(SFX)#{object}")
@@ -45,70 +46,118 @@ obj_to_process = new_objects + changed_obj_to_process
 other_objects = Set.new
 local_objects = get_local_objects(client)
 local_objects &= obj_to_process
-
-unless local_objects.empty?
-  local_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/local_#{file_date}.mrc")
-  local_objects.each do |object_id|
-    result = get_local_rec(object_id, client)
-    case result[:rec_type]
-    when 'brief_rec'
-      other_objects << object_id
-    when 'local_rec'
-      local_writer.write(result[:record])
+dict = chi_dict
+no_match_file = "#{output_dir}/no_match_#{file_date}.txt"
+no_match_ids = Set.new
+if File.exist?(no_match_file)
+  File.open(no_match_file, 'r') do |input|
+    while line = input.gets
+      no_match_ids << line.chomp.to_i
     end
   end
-  local_writer.close
+else
+  forced_brief_ids = get_local_brief_objects(client)
+  if forced_brief_ids.size > 0
+    File.open(no_match_file, 'a') do |output|
+      forced_brief_ids.each do |id|
+        no_match_ids << id
+        output.puts(id)
+      end
+    end
+  end
 end
 
-remaining_objects = obj_to_process - local_objects
+writer = MARC::Writer.new("#{output_dir}/matched_#{file_date}.mrc")
 
-issn_el_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/issn_el_#{file_date}.mrc")
-issn_print_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/issn_print_#{file_date}.mrc")
-lccn_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/lccn_#{file_date}.mrc")
-oclc_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/oclc_#{file_date}.mrc")
-issn_alt_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/issn_alt_#{file_date}.mrc")
-lccn_alt_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/lccn_alt_#{file_date}.mrc")
-oclc_alt_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/oclc_alt_#{file_date}.mrc")
-
+processed_file = "#{output_dir}/processed_#{file_date}.txt"
+processed_ids = Set.new
+File.open(processed_file, 'r') do |input|
+  while line = input.gets
+    line.chomp!
+    processed_ids << line.to_i
+  end
+end
+remaining_objects = obj_to_process - local_objects - no_match_ids - processed_ids
+processed_output = File.open(processed_file, 'a')
+no_match_output = File.open(no_match_file, 'a')
+## There is a limit to the number
+## of API calls one can make to Worldcat
+## in a day
 api_count = 0
 remaining_objects.each do |object_id|
-  break if api_count > 60_000
+  break if api_count > 200_000
   result = get_rec(object_id, client)
   api_count += result[:api_count]
   case result[:rec_type]
   when 'brief_rec'
-    other_objects << object_id
+    no_match_output.puts(object_id)
   when 'issn_el'
-    issn_el_writer.write(result[:record])
+    writer.write(result[:record])
+    processed_ids << object_id
+    processed_output.puts(object_id)
   when 'issn_print'
-    issn_print_writer.write(result[:record])
+    writer.write(result[:record])
+    processed_ids << object_id
+    processed_output.puts(object_id)
   when 'issn_alt'
-    issn_alt_writer.write(result[:record])
+    writer.write(result[:record])
+    processed_ids << object_id
+    processed_output.puts(object_id)
   when 'lccn'
-    lccn_writer.write(result[:record])
+    writer.write(result[:record])
+    processed_ids << object_id
+    processed_output.puts(object_id)
   when 'lccn_alt'
-    lccn_alt_writer.write(result[:record])
+    writer.write(result[:record])
+    processed_ids << object_id
+    processed_output.puts(object_id)
   when 'oclc'
-    oclc_writer.write(result[:record])
+    writer.write(result[:record])
+    processed_ids << object_id
+    processed_output.puts(object_id)
   when 'oclc_alt'
-    oclc_alt_writer.write(result[:record])
+    writer.write(result[:record])
+    processed_ids << object_id
+    processed_output.puts(object_id)
   end
 end
+no_match_output.close
+writer.close
 
-issn_el_writer.close
-issn_print_writer.close
-lccn_writer.close
-oclc_writer.close
-issn_alt_writer.close
-lccn_alt_writer.close
-oclc_alt_writer.close
-
-unless other_objects.empty?
+unless local_objects.empty?
+  no_match_output = File.open(no_match_file, 'a')
+  local_writer = MARC::Writer.new("#{output_dir}/local_#{file_date}.mrc")
+  local_objects.each do |object_id|
+    result = get_local_rec(object_id, client)
+    if result[:rec_type] == 'brief_rec'
+      no_match_output.puts(object_id)
+    else
+      processed_ids << object_id
+      processed_output.puts(object_id)
+      local_writer.write(result[:record])
+    end
+  end
+  no_match_output.close
+  local_writer.close
+end
+no_match_ids = Set.new
+File.open(no_match_file, 'r') do |input|
+  while line = input.gets
+    line.chomp!
+    no_match_ids << line.to_i
+  end
+end
+unless no_match_ids.empty?
   record_date = time.strftime('%y%m%d')
-  brief_writer = MARC::Writer.new("#{ROOT_DIR}/output/incremental/brief_#{file_date}.mrc")
-  other_objects.each do |object_id|
-    record = process_no_match(object_id, client, record_date)
-    brief_writer.write(record)
+  brief_writer = MARC::Writer.new("#{output_dir}/brief_#{file_date}.mrc")
+  File.open(no_match_file, 'a') do |output|
+    no_match_ids.each do |object_id|
+      record = process_no_match(object_id, client, record_date, dict)
+      brief_writer.write(record)
+      processed_ids << object_id
+      processed_output.puts(object_id)
+      output.puts(object_id)
+    end
   end
   brief_writer.close
 end

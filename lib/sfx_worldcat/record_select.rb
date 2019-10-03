@@ -1,9 +1,6 @@
 require 'marc'
 
 module SFXWorldcat
-  include SFXWorldcat::SFX
-  include SFXWorldcat::Worldcat
-
   ### First look for a DLC record for the e-ISSN given
   ### (first electronic, then print), then do the same for a print ISSN;
   ### if not found in that way, move to LCCN

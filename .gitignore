@@ -3,7 +3,6 @@
 /tmp/
 Gemfile.lock
 *.rb~
-*.mrc
 /output/*.*
 /output/full/*.*
 /output/incremental/*.*

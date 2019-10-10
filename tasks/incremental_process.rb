@@ -68,13 +68,14 @@ else
 end
 
 writer = MARC::Writer.new("#{output_dir}/matched_#{file_date}.mrc")
-
 processed_file = "#{output_dir}/processed_#{file_date}.txt"
 processed_ids = Set.new
-File.open(processed_file, 'r') do |input|
-  while line = input.gets
-    line.chomp!
-    processed_ids << line.to_i
+if File.exist?(processed_file)
+  File.open(processed_file, 'r') do |input|
+    while line = input.gets
+      line.chomp!
+      processed_ids << line.to_i
+    end
   end
 end
 remaining_objects = obj_to_process - local_objects - no_match_ids - processed_ids

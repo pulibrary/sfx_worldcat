@@ -119,6 +119,7 @@ module SFXWorldcat
     changed_object_title(date, client).each do |id|
       object_ids << id
     end
+    object_ids
   end
 
   def get_related_objects(object_id, client)

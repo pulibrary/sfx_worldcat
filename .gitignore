@@ -1,7 +1,6 @@
 .DS_Store
 /.bundle/
 /tmp/
-Gemfile.lock
 *.rb~
 /output/*.*
 /output/full/*.*

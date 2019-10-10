@@ -634,7 +634,7 @@ module SFXWorldcat
     new_rec
   end
 
-  def process_bib_base(bib, object_id, dict)
+  def process_bib_base(bib, object_id)
     is_match = bib['003'].nil? || bib['003'].value != 'SFX'
     bib = field_delete(fields_to_delete, bib)
     bib = field_delete(('900'..'999').to_a, bib)
@@ -692,7 +692,6 @@ module SFXWorldcat
     bib = empty_subfield_fix(bib)
     bib = fix_008(bib)
     bib = sort_fields(bib)
-    bib = process_chinese_record(bib, dict)
     bib
   end
 

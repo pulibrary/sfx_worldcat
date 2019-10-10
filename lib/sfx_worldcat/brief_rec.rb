@@ -111,7 +111,8 @@ module SFXWorldcat
         record.append(field)
       end
     end
-    record = process_bib_base(record, object_id, dict)
+    record = process_bib_base(record, object_id)
+    record = process_chinese_record(record, dict)
     record
   end
 end

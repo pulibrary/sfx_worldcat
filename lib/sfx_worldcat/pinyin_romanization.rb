@@ -26,7 +26,8 @@ module SFXWorldcat
 
   ### Loading the character to pinyin hash
   def chi_dict
-    YAML.load(File.read("./dict3.yaml"))
+    fname = File.join(File.dirname(__FILE__), 'dict3.yaml')
+    YAML.load(File.read(fname))
   end
 
   ### Maximum number of characters in the dictionary keys

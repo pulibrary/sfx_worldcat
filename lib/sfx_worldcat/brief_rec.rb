@@ -1,7 +1,5 @@
 module SFXWorldcat
-  include SFXWorldcat::SFX
-
-  def process_no_match(object_id, client, record_date)
+  def process_no_match(object_id, client, record_date, dict)
     language = get_language(object_id, client)
     publishers = get_publishers(object_id, language, client)
     titles = get_titles(object_id, language, client)
@@ -114,6 +112,7 @@ module SFXWorldcat
       end
     end
     record = process_bib_base(record, object_id)
+    record = process_chinese_record(record, dict)
     record
   end
 end

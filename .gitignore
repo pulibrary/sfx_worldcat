@@ -1,12 +1,7 @@
 .DS_Store
 /.bundle/
 /tmp/
-Gemfile.lock
 *.rb~
-*.mrc
-/output/*.mrc
-/output/*.txt
-/output/full/*.mrc
-/output/full/*.txt
-/output/incremental/*.txt
-/output/incremental/*.mrc
+/output/*.*
+/output/full/*.*
+/output/incremental/*.*

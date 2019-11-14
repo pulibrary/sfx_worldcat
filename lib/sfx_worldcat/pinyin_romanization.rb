@@ -21,6 +21,7 @@ module SFXWorldcat
 
   ### Pattern for identifying relevant tokens for processing numbers
   def num_token_regex
+    # Any letter with a pound and then a number
     /^([A-Za-z]+)#([0-9]*)$/
   end
 
@@ -120,13 +121,19 @@ module SFXWorldcat
     string.gsub!(/(\u201c)([^\u201c\u201d]+)(\u201d)/) { |m| " #{$1}#{$2[0].upcase}#{$2[1..-1]}#{$3} " }
     string.gsub!(/([\'\u2018])([^\'\u2018\u2019]+)([\'\u2019])/) { |m| " #{$1}#{$2[0].upcase}#{$2[1..-1]}#{$3} " }
     if is_name?(tag, indicators, subf_code)
-      comma = subf_code == 'r' ? ',' : ''
+      comma = subf_code == 'r' ? '' : ','
       apos = ''
-      m = /^(\([^\)]*\) ?)?(\S+)\s+(\S+)\s*(.*)$/.match(new_string)
+      m = /^(\([^\)]*\) ?)?(\S+)\s+(\S+)\s*(.*)$/.match(string)
       if m
         apos = "'" if m[4].size > 0 && m[4] =~ /^[aeiou]/
-        string = m[1] + m[2][0].upcase + m[2][1..-1] + comma + ' ' +
-          m[3][0].upcase + m[3][1..-1] + apos + m[4]
+        string = m[1] || ''
+        string += m[2][0].upcase
+        string += m[2][1..-1]
+        string += comma + ' '
+        string += m[3][0].upcase
+        string += m[3][1..-1]
+        string += apos
+        string += m[4]
       end
     end
     string[0] = string[0].upcase
@@ -149,69 +156,14 @@ module SFXWorldcat
     i = 0
     while i < token_count
       toki = tokens[i]
+      # "juan", " ", "qi#7", " ", "qian#1000", " ", "san#3", " ", "bai#100", " ", "er#2", " ", "shi#10", " ", "er#2", " ", "zhi", " ", "qi#7", " ", "qian#1000", " ", "san#3", " ", "bai#100", " ", "er#2", " ", "shi#10", " ", "si#4", " ", "", " ", "", "/"
       if toki =~ num_token_regex
-        num_version = ''
-        text_version = ''
-        i.upto(token_count - 1).each do |j|
-          tokj = tokens[j]
-          if (j % 2 == 0 && tokj =~ num_token_regex).nil? || j == token_count - 1
-            if tokj =~ num_token_regex
-              m = num_token_regex.match(tokj)
-              text_version << m[1]
-              if m[2] == ''
-                num_version << m[1] + ' '
-              else
-                num_version << m[2] + ' '
-              end
-            elsif j == token_count - 1
-              text_version << tokj + ' '
-              num_version << tokj + ' '
-            end
-            if num_version =~ /^di [0-9]|[0-9] [0-9] [0-9] [0-9]|[0-9]+ nian [0-9]+ yue|[0-9]+ yue [0-9]+ ri/ || use_num_version
-              use_num_version = true
-              while num_version =~ /[0-9] 10+|[1-9]0+ [1-9]/
-                m1 = /([0-9]) (10+)/.match(num_version)
-                if m1
-                  sum = m1[1].to_i * m1[2].to_i
-                  num_version.gsub!(m1[0], sum.to_s)
-                else
-                  m2 = /([0-9]+) ([1-9]0*)/.match(num_version)
-                  if m2
-                    sumb = m2[1].to_i + m2[2].to_i
-                    num_version.gsub!(m2[0], sumb.to_s)
-                  end
-                end
-              end
-              num_version.gsub!(/([0-9]) ([0-9]) ([0-9]) ([0-9])/, '\1\2\3\4')
-              if use_num_version
-                while num_version =~ /[0-9] [0-9]/
-                  num_version.gsub!(/([0-9]) ([0-9])/, '\1\2')
-                end
-              end
-            end
-            num_version.strip!
-            text_version.strip!
-            if use_num_version
-              output_string << num_version + ' '
-            else
-              output_string << text_version + ' '
-            end
-            i = j
-            break
-          end
-          if j % 2 == 0
-            m3 = num_token_regex.match(tokj)
-            text_version << m3[1] + ' '
-            if m3[2] == ''
-              num_version << m3[1] + ' '
-            else
-              num_version << m3[2] + ' '
-            end
-          else
-            text_version << tokj.strip
-            num_version << tokj.strip
-          end
-        end
+        # "qi#7", " ", "qian#1000", " ", "san#3", " ", "bai#100", " ", "er#2", " ", "shi#10", " ", "er#2", " ", "zhi"
+        # "qi#7", " ", "qian#1000", " ", "san#3", " ", "bai#100", " ", "er#2", " ", "shi#10", " ", "si#4"
+        results  = consume_consecutive_number_token(tokens: tokens, i: i, output_string: output_string, token_count: token_count, use_num_version: use_num_version)
+        i = results[:i]
+        output_string = results[:output_string]
+        use_num_version = results[:use_num_version]
       elsif toki.size > 0
         output_string << toki
         i += 1
@@ -220,6 +172,101 @@ module SFXWorldcat
       end
     end
     output_string
+  end
+
+  def consume_consecutive_number_token(tokens: , i: , output_string: , token_count:, use_num_version: )
+
+            # "qi#7", " ", "qian#1000", " ", "san#3", " ", "bai#100", " ", "er#2", " ", "shi#10", " ", "er#2", " ", "zhi"
+        # "qi#7", " ", "qian#1000", " ", "san#3", " ", "bai#100", " ", "er#2", " ", "shi#10", " ", "si#4"
+
+    num_version = ''
+    text_version = ''
+    # consecutive number strings to form a complete numeric number
+    i.upto(token_count - 1).each do |j|
+      current_token = tokens[j]
+      if (j % 2 == 0 && current_token =~ num_token_regex).nil? || j == token_count - 1
+
+        if current_token =~ num_token_regex
+          m = num_token_regex.match(current_token)
+          text_version << m[1]
+          if m[2] == ''
+            num_version << m[1] + ' '
+          else
+            num_version << m[2] + ' '
+          end
+        elsif j == token_count - 1
+          text_version << current_token + ' '
+          num_version << current_token + ' '
+        end
+        if num_version =~ /^di [0-9]|[0-9] [0-9] [0-9] [0-9]|[0-9]+ nian [0-9]+ yue|[0-9]+ yue [0-9]+ ri/ || use_num_version
+          use_num_version = true
+          while num_version =~ /[0-9] 10+|[1-9]0+ [1-9]/
+
+            num_version  = number_representation_to_number_string(num_version)
+            # # number representation to number string
+            # # 9 1000 -> 9000
+            # # 9 90   -> 99
+            # m1 = /([0-9]) (10+)/.match(num_version)
+            # if m1
+            #   sum = m1[1].to_i * m1[2].to_i
+            #   num_version.gsub!(m1[0], sum.to_s)
+            # else
+            #   m2 = /([0-9]+) ([1-9]0*)/.match(num_version)
+            #   if m2
+            #     sumb = m2[1].to_i + m2[2].to_i
+            #     num_version.gsub!(m2[0], sumb.to_s)
+            #   end
+            # end
+          end
+          num_version.gsub!(/([0-9]) ([0-9]) ([0-9]) ([0-9])/, '\1\2\3\4')
+          if use_num_version
+            while num_version =~ /[0-9] [0-9]/
+              num_version.gsub!(/([0-9]) ([0-9])/, '\1\2')
+            end
+          end
+        end
+        num_version.strip!
+        text_version.strip!
+        if use_num_version
+          output_string << num_version + ' '
+        else
+          output_string << text_version + ' '
+        end
+        i = j
+        break
+      end
+      if j % 2 == 0
+        m3 = num_token_regex.match(current_token)
+        text_version << m3[1] + ' '
+        if m3[2] == ''
+          num_version << m3[1] + ' '
+        else
+          num_version << m3[2] + ' '
+        end
+      else
+        text_version << current_token.strip
+        num_version << current_token.strip
+      end
+    end
+
+    {tokens: tokens, i: i, output_string: output_string, use_num_version: use_num_version}
+  end
+
+  def  number_representation_to_number_string(num_version)
+    # 9 1000 -> 9000
+    # 9 90   -> 99
+    m1 = / ([0-9]) (10+)/.match(' ' + num_version)
+    if m1
+      sum = m1[1].to_i * m1[2].to_i
+      num_version.gsub!(m1[0].strip, sum.to_s)
+    else
+      m2 = /([0-9]+) ([1-9]0*)/.match(num_version)
+      if m2
+        sumb = m2[1].to_i + m2[2].to_i
+        num_version.gsub!(m2[0], sumb.to_s)
+      end
+    end
+    num_version
   end
 
   ### If there are Chinese characters in non-880 fields with corresponding 880s, swap those fields

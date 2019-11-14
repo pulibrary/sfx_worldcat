@@ -1,8 +1,8 @@
 # config valid for current version and patch releases of Capistrano
-lock "~> 3.11.1"
+lock '~> 3.11.1'
 
-set :application, "sfx_worldcat"
-set :repo_url, "git@github.com:pulibrary/sfx_worldcat.git"
+set :application, 'sfx_worldcat'
+set :repo_url, 'git@github.com:pulibrary/sfx_worldcat.git'
 
 set :deploy_to, '/opt/sfx_worldcat'
 set :bundle_flags, '--no-deployment --quiet'

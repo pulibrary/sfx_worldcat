@@ -1,0 +1,25 @@
+=LDR  01325cam a2200301 i 4500
+=001  3061833
+=005  20171130170238.0
+=007  hdrafu---bucu
+=008  830929s1978\\\\ch\\\\\\a\\\\f00000\chi\d
+=035  \\$a(OCoLC)23206492
+=035  \\$a(CStRLIN)NJPX83-B1551
+=040  \\$aNjP-G$cNjP-G$dCStRLIN
+=043  \\$aa-cc---
+=066  \\$c{dollar}1
+=090  \\$aMf 9101/5565 (8015)$i02/29/88 T
+=245  00$6880-01$aYong le da dian$h[microform] :$bJuan zhi er wan wu bai qi shi er, ji /$c[jie jin ... et al. zuan xiu].
+=260  \\$6880-02$g[ming jia jing long qing jian nei fu zhong xie ben]
+=300  \\$a25 double leaves (8 columns), bound.
+=500  \\$aMs.
+=533  \\$aMicrofilm.$bTaipei :$cNational Central Library,$d1978. --$e1 reel ; 35 mm.
+=650  \0$aEncyclopedias and dictionaries, Chinese$xEarly works to 1800.$0http://id.loc.gov/authorities/subjects/sh2008119449
+=700  1\$aXie, Jin,$d1369-1415.$0http://id.loc.gov/authorities/names/n81050208
+=880  00$6245-01$a永樂大典$h[microform] :$b卷之二萬五百七十二，　積　/$c[解縉 ... et al. 纂修].
+=880  \\$6260-02$g[明嘉靖隆慶間内府重寫本]
+=987  \\$aPINYIN$bCStRLIN$c20010422$dc$e1.1
+=950  \\$lGEST
+=955  \\$lGEST$c1$qNCL 5-25-78$i02/29/88 C
+=998  \\$a02/29/88$tc$s9114$nNjP-G$wNJPX83B1551$d04/22/01$cDC$bCTC$i880229$lNJPX
+

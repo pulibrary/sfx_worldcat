@@ -8,6 +8,8 @@ set :deploy_to, '/opt/sfx_worldcat'
 set :bundle_flags, '--no-deployment --quiet'
 
 append :linked_dirs, '.bundle'
+append :linked_dirs, 'output/full'
+append :linked_dirs, 'output/incremental'
 
 # Default value for keep_releases is 5
 # set :keep_releases, 5

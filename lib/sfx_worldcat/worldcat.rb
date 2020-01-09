@@ -1,6 +1,6 @@
 module SFXWorldcat
   def worldcat_conn
-    conn = Faraday.new(url: WORLDCAT_URL) do |faraday|
+    conn = Faraday.new(url: WORLDCAT_SEARCH_URL) do |faraday|
       faraday.request   :url_encoded
       faraday.response  :logger
       faraday.adapter   Faraday.default_adapter

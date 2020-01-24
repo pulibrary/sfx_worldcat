@@ -56,9 +56,8 @@ obj_to_process = new_objects + changed_obj_to_process
 puts "New active objects since last incremental update #{new_objects.count}"
 puts "Active objects changed since last incremental update #{changed_obj_to_process.count}"
 
-other_objects = Set.new
 local_objects = get_local_objects(client)  # librarian marked as in SFX as local
-local_objects &= obj_to_process
+obj_to_process += local_objects
 dict = chi_dict
 no_match_file = "#{output_dir}/no_match_#{file_date}.txt"
 no_match_ids = Set.new
@@ -111,31 +110,7 @@ remaining_objects.each do |object_id|
   case result[:rec_type]
   when 'brief_rec'
     no_match_output.puts(object_id)
-  when 'issn_el'
-    writer.write(result[:record])
-    processed_ids << object_id
-    processed_output.puts(object_id)
-  when 'issn_print'
-    writer.write(result[:record])
-    processed_ids << object_id
-    processed_output.puts(object_id)
-  when 'issn_alt'
-    writer.write(result[:record])
-    processed_ids << object_id
-    processed_output.puts(object_id)
-  when 'lccn'
-    writer.write(result[:record])
-    processed_ids << object_id
-    processed_output.puts(object_id)
-  when 'lccn_alt'
-    writer.write(result[:record])
-    processed_ids << object_id
-    processed_output.puts(object_id)
-  when 'oclc'
-    writer.write(result[:record])
-    processed_ids << object_id
-    processed_output.puts(object_id)
-  when 'oclc_alt'
+  else
     writer.write(result[:record])
     processed_ids << object_id
     processed_output.puts(object_id)

@@ -243,7 +243,7 @@ module SFXWorldcat
       FROM `#{SFX_LOCAL_DATABASE}`.LCL_OBJECT_IDENTIFIERS
       WHERE
         object_id = #{object_id}
-        AND value LIKE 'OCLC%'
+        AND LOWER(value) LIKE 'oclc%'
     )
   end
 
@@ -252,8 +252,16 @@ module SFXWorldcat
       SELECT object_id
       FROM `#{SFX_LOCAL_DATABASE}`.LCL_OBJECT_IDENTIFIERS
       WHERE
-        value LIKE 'brief'
-        OR value LIKE 'BRIEF'
+        LOWER(value) = 'brief'
+    )
+  end
+  
+  def local_skip_object_query
+    %(
+      SELECT object_id
+      FROM `#{SFX_LOCAL_DATABASE}`.LCL_OBJECT_IDENTIFIERS
+      WHERE
+        LOWER(value) = 'skip'
     )
   end
 
@@ -262,8 +270,7 @@ module SFXWorldcat
       SELECT object_id
       FROM `#{SFX_LOCAL_DATABASE}`.LCL_OBJECT_IDENTIFIERS
       WHERE
-        value LIKE 'OCLC%'
-        OR value LIKE 'oclc%'
+        LOWER(value) LIKE 'oclc%'
     )
   end
 end

@@ -1,7 +1,29 @@
 require 'mysql2'
 module SFXWorldcat
   def unwanted_target_ids
-    [3780000000001251, 3810000000000426, 1000000000000645, 5280000000000120]
+    [
+      3780000000001251,
+      3810000000000426,
+      1000000000000645,
+      5280000000000120, 
+      5280000000000114,
+      5280000000000115,
+      5280000000000116,
+      5280000000000122,
+      5280000000000123,
+      5280000000000124,
+      5280000000000125,
+      5280000000000126,
+      5280000000000127,
+      5280000000000128,
+      5280000000000129,
+      5280000000000130,
+      5280000000000135,
+      5280000000000136,
+      5280000000000132,
+      5280000000000133,
+      5280000000000131
+    ]
   end
 
   def cjkr_languages
@@ -11,6 +33,9 @@ module SFXWorldcat
   def get_unwanted_objects(client)
     object_ids = Set.new
     client.query(unwanted_object_query).each do |row|
+      object_ids << row['object_id']
+    end
+    client.query(local_skip_object_query).each do |row|
       object_ids << row['object_id']
     end
     object_ids

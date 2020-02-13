@@ -16,3 +16,7 @@ The process will create 4 putput files in /opt/sfx_worldcat/current/output which
 ## To reset to run again
 `cd /opt/sfx_worldcat/current/output/incremental`
 `rm *{current_date}*`
+
+## To Deploy to the server
+`cap staging deploy`
+`cap production deploy`

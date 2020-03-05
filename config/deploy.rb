@@ -7,6 +7,8 @@ set :repo_url, 'git@github.com:pulibrary/sfx_worldcat.git'
 set :deploy_to, '/opt/sfx_worldcat'
 set :bundle_flags, '--no-deployment --quiet'
 
+set :whenever_roles, %w{app}
+
 append :linked_dirs, '.bundle'
 append :linked_dirs, 'output/full'
 append :linked_dirs, 'output/incremental'

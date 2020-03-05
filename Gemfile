@@ -6,6 +6,7 @@ gem 'marc'
 gem 'faraday', '~> 0.13'
 gem 'marc_cleanup', github: 'pulibrary/marc_cleanup', tag: 'v0.8.7'
 gem 'rake'
+gem 'whenever', require: false
 
 group :development do
   gem 'rspec'

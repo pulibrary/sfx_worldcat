@@ -77,15 +77,16 @@ else
       end
     end
   end
+  puts "Objects forced to not match with OCLC by librarian #{forced_brief_ids.count}"
 end
 
 # check how many objects have been expressly specified librarian
 # also see how many are being forced a record to be created from scratch
 puts "Objects specified by a librarian #{local_objects.count}"
-puts "Objects forced to not match with OCLC by librarian #{forced_brief_ids.count}"
 
 matched_file_name = "#{output_dir}/matched_#{file_date}.mrc"
-writer = MARC::Writer.new(matched_file_name)
+marc_writer_file = File.open(matched_file_name, 'a')
+writer = MARC::Writer.new(marc_writer_file)
 processed_file = "#{output_dir}/processed_#{file_date}.txt"
 processed_ids = Set.new
 if File.exist?(processed_file)

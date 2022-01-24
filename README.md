@@ -1,5 +1,7 @@
 # SFX_Worldcat
 
+## Currently unused as we have transitioned to ALMA
+
 Retrieve records from Worldcat based on identifiers found in the SFX KB.
 
 ## To run the script on the server:
